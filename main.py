@@ -14,20 +14,26 @@ def ensure_directory(path):
 
 def run_surya_ocr(pdf_name, surya_path="surya_ocr"):
     """Run Surya OCR on the PDF file"""
+    print(pdf_name)
     try:
-        # Run surya command
-        result = subprocess.run(
-            ["RECOGNITION_BATCH_SIZE=16", surya_path, pdf_name],
-            check=True,
+        # Run surya command with environment variable
+        env = os.environ.copy()
+        env["RECOGNITION_BATCH_SIZE"] = "16"
+        subprocess.run(
+            [surya_path, pdf_name],
+            env=env,
+            # check=True,
         )
         print(f"Surya OCR completed successfully for {pdf_name}")
         return True
     except subprocess.CalledProcessError as e:
         print(f"Error running Surya OCR: {str(e)}")
         return False
-    except FileNotFoundError:
+    except FileNotFoundError as e:
+        print(e)
         print(f"Error: Surya command not found at {surya_path}")
         return False
+    
 
 def combine_pdfs(input_folder, output_path):
     """Combine multiple PDFs into a single PDF"""
